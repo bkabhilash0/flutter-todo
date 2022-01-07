@@ -23,14 +23,16 @@ class TodoArchiveScreen extends StatelessWidget {
           height: 20,
         ),
         Flexible(
-          child: ListView.builder(
-            itemBuilder: (_, index) {
-              return ChangeNotifierProvider.value(
-                value: myTasks[index],
-                child: const TodoItem(),
-              );
-            },
-            itemCount: myTasks.length,
+          child: Scrollbar(
+            child: ListView.builder(
+              itemBuilder: (_, index) {
+                return ChangeNotifierProvider.value(
+                  value: myTasks[index],
+                  child: const TodoItem(),
+                );
+              },
+              itemCount: myTasks.length,
+            ),
           ),
         )
       ],

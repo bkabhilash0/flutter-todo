@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/provider/tasks.dart';
+import 'package:todo/screens/profile_screen.dart';
 import 'package:todo/screens/todo_archive_screen.dart';
 import 'package:todo/screens/todo_done_screen.dart';
 import 'package:todo/screens/todo_overview_screen.dart';
@@ -39,11 +40,12 @@ class MyApp extends StatelessWidget {
               bodyText2: TextStyle(fontSize: 14, color: Colors.grey),
             )),
         home: const RootPage(),
-        // routes: {
-        //   TodoOverviewScreen.routeName: (_) => const TodoOverviewScreen(),
-        //   TodoDoneScreen.routeName: (ctx) => const TodoDoneScreen(),
-        //   TodoArchiveScreen.routeName: (_) => const TodoArchiveScreen()
-        // },
+        routes: {
+          //   TodoOverviewScreen.routeName: (_) => const TodoOverviewScreen(),
+          //   TodoDoneScreen.routeName: (ctx) => const TodoDoneScreen(),
+          //   TodoArchiveScreen.routeName: (_) => const TodoArchiveScreen()
+          ProfileScreen.routeName: (_) => const ProfileScreen()
+        },
       ),
     );
   }
@@ -58,6 +60,33 @@ class RootPage extends StatefulWidget {
 
 class _RootPageState extends State<RootPage> {
   int _selectedIndex = 0;
+  bool _isLoading = false;
+  bool _isError = false;
+  String _errorMessage = "";
+
+  @override
+  void initState() {
+    setState(() {
+      _isLoading = true;
+    });
+    Provider.of<TasksProvider>(context, listen: false)
+        .fetchTasks()
+        .then((value) {
+      setState(() {
+        _isLoading = false;
+      });
+    })
+        // ignore: avoid_print
+        .catchError((err) {
+      print(err.toString());
+      setState(() {
+        _isLoading = false;
+        _isError = true;
+        _errorMessage = err.toString();
+      });
+    });
+    super.initState();
+  }
 
   void _onChange(value) {
     setState(() {
@@ -84,10 +113,30 @@ class _RootPageState extends State<RootPage> {
   //   }
   // }
 
+  Widget _getBody() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (_isError) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            "Oops! Something Went Wrong Try Reloading the App...$_errorMessage",
+            style: const TextStyle(
+                fontSize: 16, color: Colors.red, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    } else {
+      return _pages[_selectedIndex];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: _getBody(),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.list), label: "Tasks"),

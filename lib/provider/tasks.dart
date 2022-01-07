@@ -15,7 +15,9 @@ class TasksProvider with ChangeNotifier {
   ];
 
   List<Task> get items {
-    return [..._myTasks];
+    final List<Task> _modifiedList = [..._myTasks];
+    _modifiedList.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+    return [..._modifiedList];
   }
 
   List<Task> get pendingTasks {
@@ -31,8 +33,8 @@ class TasksProvider with ChangeNotifier {
   }
 
   void addTask(String title, DateTime date) {
-    _myTasks
-        .add(Task(title: title, id: DateTime.now().toString(), dateTime: date));
+    _myTasks.insert(
+        0, Task(title: title, id: DateTime.now().toString(), dateTime: date));
     notifyListeners();
   }
 
@@ -42,10 +44,13 @@ class TasksProvider with ChangeNotifier {
           .get(Uri.parse("https://jsonplaceholder.typicode.com/todos"));
       final data = json.decode(todos.body) as List;
       final requiredData = data
-          .map((e) =>
-              Task(id: e["id"].toString(), title: e["title"], dateTime: DateTime.now()))
+          .map((e) => Task(
+              id: e["id"].toString(),
+              title: e["title"],
+              dateTime: DateTime.now()))
           .toList();
       _myTasks = requiredData;
+      notifyListeners();
     } catch (e) {
       _myTasks = [];
       rethrow;

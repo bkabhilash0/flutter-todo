@@ -24,23 +24,25 @@ class TodoOverviewScreen extends StatelessWidget {
           height: 20,
         ),
         Flexible(
-          child: ListView.builder(
-            itemBuilder: (_, index) {
-              return ChangeNotifierProvider.value(
-                value: myTasks[index],
-                child: TodoItem(
-                  isLast: index == myTasks.length - 1,
-                ),
-              );
-            },
-            itemCount: myTasks.length,
+          child: Scrollbar(
+            child: ListView.builder(
+              itemBuilder: (_, index) {
+                return ChangeNotifierProvider.value(
+                  value: myTasks[index],
+                  child: TodoItem(
+                    isLast: index == myTasks.length - 1,
+                  ),
+                );
+              },
+              itemCount: myTasks.length,
+            ),
           ),
         ),
         // const SizedBox(height: 30,)
       ])),
       floatingActionButton: Draggable(
         childWhenDragging: Container(),
-        onDragEnd: (details) => print(details.offset),
+        // onDragEnd: (details) => print(details.offset),
         feedback: FloatingActionButton(
             onPressed: () {},
             child: const Icon(
